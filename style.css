@@ -1,0 +1,30 @@
+body {
+  font-family:batang;
+  font-size:450%;
+  background-image:url("image/curtain.png");
+  background-size:100%;
+  background-repeat:no-repeat;
+  text-align:center; /*center text*/
+  margin:auto; /*center block*/
+}
+p {
+  margin-bottom:0;
+  padding-bottom:0;
+}
+button {
+  font-family:inherit;
+  font-size:70%;
+  margin-bottom:0;
+}
+.following {
+  margin-top:0;
+  padding-top:0;
+}
+#credits {
+  font-size:23%;
+  color:white;
+}
+#visualizer {
+  width:500px;
+  height:220px;
+}
