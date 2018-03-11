@@ -129,15 +129,20 @@ function changeVolume() {
 }
 //Read data and initialize.
 var entries = [];
-fileReader.read("play.txt", function(data) {
+fileReader.read("play.txt", function(data) { //Although it might not complete before the user clicks something, it, in most cases, does.
 	const words = fileReader.getTokensFrom(data, undefined, '\n');
-	for(var index = 0;index < words.length;index++) { //Warning: index is modified inside the loop.
+	document.title = words[0];
+	document.getElementById("titleText").innerHTML = words[0];
+	for(var index = 1;index < words.length;index++) { //Warning: index is modified inside the loop.
 		var upperCase = words[index].toUpperCase();
-		console.log(upperCase);
 		if(upperCase === "TEXT") entries.push(new Entry(Type.TEXT, words[++index])); //Texts don't need sources.
 		else if(upperCase === "MUSIC" || upperCase === "IMAGE") {
 			entries.push(new Entry(Type[upperCase], words[index + 1], words[index + 2]));
 			index += 2;
+		}
+		else if(upperCase === "CREDITS") { //Everything below credits is credits
+			credits.innerHTML = "";
+			for(index++;index < words.length;index++) credits.innerHTML += words[index] + "<br>";
 		}
 	}
 	//Warnings for incorrect datasets
