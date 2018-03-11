@@ -6,6 +6,9 @@ Plays and displays songs and backgrounds for your plays. Use with chrome and --d
 - Play and visualize songs you need
 - Show backgrounds and short texts to show the circumstances
 
+## Dependencies
+Requires file.js from [my JS Library](https://github.com/busyVision/js-library).
+
 ## The Format
 The first line of a play file must always be the title of the play. After that, you can start specifying entries. Entries are what the helper (dis)plays when you click on the "next" button. To register one entry, write in three different, consecutive lines
 
