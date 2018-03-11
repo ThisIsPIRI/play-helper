@@ -1,0 +1,26 @@
+My awesome play(title)
+
+(the scene with letter a)
+image
+The First Image
+a.png
+
+(some dialing sound)
+music
+The First Song
+b.mp3
+
+//write comments however you like
+image
+The Second Image
+c.png
+
+as long as it isn't inside an entry.
+text
+Last Text
+
+comments aren't allowed below this
+credits
+Photo 1 : A, Photo 2 : C
+Music 1 : B
+Me You Your friend

@@ -3,18 +3,11 @@ var playButton = document.getElementById("play"), number = document.getElementBy
 var credits = document.getElementById("credits"), explanation = document.getElementById("explanation");
 var body = document.getElementById("body"), volume = document.getElementById("volume");
 
-Type = { //enum for marking type of entries
+Type = Object.freeze({ //enum for marking type of entries
 	MUSIC : 0,
 	IMAGE : 1,
 	TEXT : 2
-}
-//TODO: 
-//make sure that the first entry is always an image.
-var imageList = ["a.png", "c.png"];
-var musicList = ["b.mp3"];
-var nameList = ["a", "b", "c", "d"];
-var typeList = [1, 0, 1, 2];
-var entries = [];
+});
 credits.style.display = "none";
 //visualization init
 var visualizer = document.getElementById("visualizer");
@@ -85,36 +78,36 @@ function ended() {
 function play() {
 	explanation.innerHTML = "";
 	if(playing) {
-	ended();
+		ended();
 	}
 	else if(num < entries.length) {
-	switch(entries[num].type) {
+		switch(entries[num].type) {
 		case Type.MUSIC:
-		music = new Audio("sound/" + entries[num].source);
-		//music.crossOrigin = "anonymous";
-		music.addEventListener("ended", ended);
-		//visualization
-		source = context.createMediaElementSource(music);
-		analyser = context.createAnalyser();
-		source.connect(context.destination);
-		source.connect(analyser);
-		frequency = new Uint8Array(analyser.frequencyBinCount);
+			music = new Audio("sound/" + entries[num].source);
+			//music.crossOrigin = "anonymous";
+			music.addEventListener("ended", ended);
+			//visualization
+			source = context.createMediaElementSource(music);
+			analyser = context.createAnalyser();
+			source.connect(context.destination);
+			source.connect(analyser);
+			frequency = new Uint8Array(analyser.frequencyBinCount);
 
-		changeVolume();
-		music.play();
-		animationID = window.requestAnimationFrame(render);
-		playButton.innerHTML = entries[num].name + " 재생 중";
-		playing = true;
-		break;
+			changeVolume();
+			music.play();
+			animationID = window.requestAnimationFrame(render);
+			playButton.innerHTML = entries[num].name + " 재생 중";
+			playing = true;
+			break;
 
 		case Type.TEXT: case Type.IMAGE: //next() function will change the background.
-		explanation.innerHTML = entries[num].name;
-		next();
-		break;
+			explanation.innerHTML = entries[num].name;
+			next();
+			break;
+		}
 	}
-	}
-	else { //there's no musics to play
-	update();
+	else { //there's no song to play
+		update();
 	}
 	nextUsed = false;
 }
@@ -126,7 +119,7 @@ function previous() {
 	nextUsed = false;
 }
 function next() {
-	changeBackground(); //description and background mismatch occurs if this is called after increment.
+	changeBackground(); //description and background mismatch if this is called after increment.
 	num = num == entries.length ? num : num + 1;
 	update();
 	nextUsed = true;
@@ -134,19 +127,24 @@ function next() {
 function changeVolume() {
 	if(typeof music !== "undefined") music.volume = volume.value / 100;
 }
-if(nameList.length != typeList.length) alert("INIT ERR 1. names != types"); //failsafe
-var mInit = 0, iInit = 0;
-for(i = 0;i < nameList.length;i++) {
-	if(typeList[i] == Type.MUSIC) {
-	entries.push(new Entry(typeList[i], nameList[i], musicList[mInit++]));
+//Read data and initialize.
+var entries = [];
+fileReader.read("play.txt", function(data) { //Although it might not complete before the user clicks something, it, in most cases, does.
+	const words = fileReader.getTokensFrom(data, undefined, '\n');
+	document.title = words[0];
+	document.getElementById("titleText").innerHTML = words[0];
+	for(var index = 1;index < words.length;index++) { //Warning: index is modified inside the loop.
+		var upperCase = words[index].toUpperCase();
+		if(upperCase === "TEXT") entries.push(new Entry(Type.TEXT, words[++index])); //Texts don't need sources.
+		else if(upperCase === "MUSIC" || upperCase === "IMAGE") {
+			entries.push(new Entry(Type[upperCase], words[index + 1], words[index + 2]));
+			index += 2;
+		}
+		else if(upperCase === "CREDITS") { //Everything below credits is credits
+			credits.innerHTML = "";
+			for(index++;index < words.length;index++) credits.innerHTML += words[index] + "<br>";
+		}
 	}
-	else if(typeList[i] == Type.IMAGE) {
-	entries.push(new Entry(typeList[i], nameList[i], imageList[iInit++]));
-	}
-	else {
-	entries.push(new Entry(typeList[i], nameList[i]));
-	}
-}
-//failsafe
-if(nameList.length != entries.length) alert("INIT ERR 2. names != entries");
-if(entries[0].type != Type.IMAGE) alert("INIT ERR 3. first entry != image");
+	//Warnings for incorrect datasets
+	if(entries[0].type != Type.IMAGE) alert("The first entry is not an image. Problems may occur.");
+});
