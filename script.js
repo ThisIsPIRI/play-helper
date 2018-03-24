@@ -1,7 +1,8 @@
 var num = 0, playing = false, nextUsed = false, animationID, music;
-var playButton = document.getElementById("play"), number = document.getElementById("number");
-var credits = document.getElementById("credits"), explanation = document.getElementById("explanation");
-var body = document.getElementById("body"), volume = document.getElementById("volume");
+const playButton = document.getElementById("play"), number = document.getElementById("number");
+const credits = document.getElementById("credits"), explanation = document.getElementById("explanation");
+const body = document.getElementById("body"), volume = document.getElementById("volume");
+const PROGRESS_HEIGHT = 20;
 
 Type = Object.freeze({ //enum for marking type of entries
 	MUSIC : 0,
@@ -36,31 +37,37 @@ function changeBackground() {
 }
 function render(timestamp) {
 	analyser.getByteFrequencyData(frequency);
-	var width = visualizer.width, height = visualizer.height - 20; //to reserve space for progress bar
+	var width = visualizer.width, height = visualizer.height - PROGRESS_HEIGHT; //to reserve space for progress bar
 	var range = frequency.length - 330; //data near end are rarely used.(almost always 0)
 	var hori = width / range, verti = height / 256; //the values are between 0 and 255.
-	drawer.clearRect(0, 0, width, height);
+	drawer.clearRect(0, 0, width, height + PROGRESS_HEIGHT); //Have to clear the progress bar too; it can go backward(with navigate()).
 	for(var i = 0;i < range;i++) {
-	drawer.fillRect(hori * i, height - frequency[i] * verti, hori, frequency[i] * verti);
+		drawer.fillRect(hori * i, height - frequency[i] * verti, hori, frequency[i] * verti);
 	}
 	drawer.fillRect(0, height, (music.currentTime / music.duration) * width, height + 20);
 	animationID = requestAnimationFrame(render);
 }
+function navigate(event) {
+	//Calculate the relative horizontal position of the click within the visualizer(0.0~1.0)
+	const targetProgress = (event.clientX - visualizer.getBoundingClientRect().left) / visualizer.width;
+	//Go to the target progress. The progress bar will be updated in the next render().
+	music.currentTime = music.duration * targetProgress;
+}
 function update() {
 	if(num == entries.length) { //reached the end of list.
-	number.innerHTML = '∞';
-	explanation.innerHTML = "Thank you.";
-	explanation.style.color = "white";
-	body.style["background-image"] = "url(\"image/curtain.png\")";
-	credits.style.display = "";
-	//to prevent a strange bug which causes the credits to lose its css attributes when programmatically changed.
-	//it happened only in one specific place so far.
-	credits.style["font-size"] = "23%";
+		number.innerHTML = '∞';
+		explanation.innerHTML = "Thank you.";
+		explanation.style.color = "white";
+		body.style["background-image"] = "url(\"image/curtain.png\")";
+		credits.style.display = "";
+		//to prevent a strange bug which causes the credits to lose its css attributes when programmatically changed.
+		//it happened only in one specific place so far.
+		credits.style["font-size"] = "23%";
 	}
 	else {
-	number.innerHTML = (num + 1);
-	credits.style.display = "none";
-	explanation.style.color = "black";
+		number.innerHTML = (num + 1);
+		credits.style.display = "none";
+		explanation.style.color = "black";
 	}
 }
 function ended() {

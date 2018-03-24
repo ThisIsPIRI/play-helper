@@ -16,6 +16,6 @@ The first line of a play file must always be the title of the play. After that, 
 - the text to be shown with the entry and
 - the source filename of the entry(not needed for text), in that order.
 
-The entries must be in the order they appear. All image files must be under the image directory and the sound files under sound directory. The case of the types doesn't matter, while that of filenames may or may not depending on your filesystem. Comments can be written outside each entries.
+The entries must be in the order they appear. All image files must be under the image directory and the sound files under sound directory. The case of the types doesn't matter, while that of filenames may or may not depending on your filesystem. Comments can be written outside each entries, but be wary that since they are used to identify entries, comments cannot contain "image", "music" or "text".
 
 After entering all entries, write "credits" in one line and everything below will be interpreted as texts for the credits. No comments are allowed below "credits". Read play.txt included with the helper for examples.
